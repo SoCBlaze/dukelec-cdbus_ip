@@ -9,49 +9,56 @@
  * Author: Duke Fong <d@d-l.io>
  */
 
-//`define SINGLE_ADDR
-`define HAS_RD_EN
 
 module cd_sram
        #(
-           parameter A_WIDTH = 8
+           parameter A_WIDTH = 8,
+           parameter C_ASIC_SRAM = 0
        )(
            input                 clk,
-`ifdef SINGLE_ADDR
-           input [(A_WIDTH-1):0] addr,
-`else
            input [(A_WIDTH-1):0] ra,
            input [(A_WIDTH-1):0] wa,
-`endif
 
-           output reg   [7:0]    rd,
-`ifdef HAS_RD_EN
+           output       [7:0]    rd,
            input                 re,
-`endif
 
            input        [7:0]    wd,
            input                 we
        );
-
-reg [7:0] ram[2**A_WIDTH-1:0];
-
-`ifdef SINGLE_ADDR
-wire [(A_WIDTH-1):0] ra = addr;
-wire [(A_WIDTH-1):0] wa = addr;
-`endif
-
-`ifndef HAS_RD_EN
-always @(*) rd <= ram[ra];
-`endif
-
-always @(posedge clk) begin
-    if (we)
-        ram[wa] <= wd;
-
-`ifdef HAS_RD_EN
-    rd <= re ? ram[ra] : 8'dx;
-`endif
+       
+generate if (C_ASIC_SRAM == 0) begin
+    reg [7:0] ram[2**A_WIDTH-1:0];
+    reg [7:0] rd_r;
+    assign rd = rd_r;
+    
+    always @(posedge clk) begin
+        if (we)
+            ram[wa] <= wd;
+    
+        rd_r <= re ? ram[ra] : 8'dx;
+    end
+end else begin
+    S018DP_RAM_DP_W256_B8_M4 ram (
+        .CLKA(clk ),
+        .CLKB(clk ),
+        
+        .CENA(~re ),
+        .CENB(~we ),
+        
+        .WENA(1'b1),
+        .WENB(~we ),
+        
+        .AA  (ra  ),
+        .AB  (wa  ),
+        
+        .QA  (rd  ),
+        .QB  (    ),
+        
+        .DA  ('bx ),
+        .DB  (wd  )
+    );
 end
-
+endgenerate
+ 
 endmodule
 

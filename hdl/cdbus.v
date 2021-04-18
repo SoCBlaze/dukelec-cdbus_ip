@@ -14,7 +14,8 @@
 module cdbus
     #(
         parameter DIV_LS = 346, // default: 115200 bps for 40MHz clk
-        parameter DIV_HS = 346
+        parameter DIV_HS = 346,
+        parameter C_ASIC_SRAM = 0
     )(
         input               clk,
         input               reset_n,
@@ -163,7 +164,10 @@ cd_csr #(
 );
 
 
-cd_ram #(.N_WIDTH(3)) cd_ram_rx_m(
+cd_ram #(
+    .N_WIDTH(3),
+    .C_ASIC_SRAM(C_ASIC_SRAM)
+) cd_ram_rx_m(
     .clk(clk),
     .reset_n(reset_n),
 
@@ -184,7 +188,10 @@ cd_ram #(.N_WIDTH(3)) cd_ram_rx_m(
     .switch_fail(rx_ram_lost)
 );
 
-cd_ram #(.N_WIDTH(1)) cd_ram_tx_m(
+cd_ram #(
+    .N_WIDTH(1),
+    .C_ASIC_SRAM(C_ASIC_SRAM)
+) cd_ram_tx_m(
     .clk(clk),
     .reset_n(reset_n),
 

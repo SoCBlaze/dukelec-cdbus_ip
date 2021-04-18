@@ -15,7 +15,8 @@
 module cd_ram
        #(
            parameter A_WIDTH = 8,
-           parameter N_WIDTH = 1
+           parameter N_WIDTH = 1,
+           parameter C_ASIC_SRAM = 0
        )(
            input                 clk,
            input                 reset_n,
@@ -67,7 +68,7 @@ generate
         assign rw_addr[i] = wr_ens[i] ? wr_addr : rd_addr;
 `endif
 
-        cd_sram cd_sram_m(
+        cd_sram #(.C_ASIC_SRAM(C_ASIC_SRAM)) cd_sram_m(
             .clk(clk),
 `ifdef SINGLE_ADDR
             .addr(rw_addr[i]),
