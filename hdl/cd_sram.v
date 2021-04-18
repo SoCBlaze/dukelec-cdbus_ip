@@ -54,7 +54,7 @@ end else begin
         .QA  (rd  ),
         .QB  (    ),
         
-        .DA  ('bx ),
+        .DA  (8'bx),
         .DB  (wd  )
     );
 end
