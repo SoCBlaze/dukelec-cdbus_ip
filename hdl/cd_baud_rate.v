@@ -32,7 +32,7 @@ assign inc = inc_d & !sync & !sync_3x;
 assign cap = cap_d & !sync & !sync_3x;
 
 wire [15:0] div = sel ? div_hs : div_ls;
-reg [15:0] cnt = 0;
+reg [15:0] cnt;
 
 always @(posedge clk) begin
     inc_d <= 0;
