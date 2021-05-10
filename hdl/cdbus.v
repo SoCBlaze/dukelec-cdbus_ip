@@ -30,7 +30,9 @@ module cdbus
 
         input               rx,
         output              tx,
-        output              tx_en
+        output              tx_t,
+        output              tx_en,
+        output              tx_en_t
     );
 
 wire full_duplex;
@@ -105,9 +107,10 @@ wire tx_d;
 wire tx_en_d;
 wire tx_may_invert = tx_invert ? ~tx_d : tx_d;
 
-assign tx_en = (reset_n && tx_push_pull) ? tx_en_d : 1'bz;
-assign tx = (reset_n && (tx_push_pull || !tx_may_invert)) ? tx_may_invert : 1'bz;
-
+assign tx_en_t = !(reset_n && tx_push_pull);
+assign tx_en = tx_en_d;
+assign tx_t = !(reset_n && (tx_push_pull || !tx_may_invert));
+assign tx = tx_may_invert;
 
 cd_csr #(
     .DIV_LS(DIV_LS),
